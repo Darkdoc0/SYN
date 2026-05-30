@@ -1,0 +1,36 @@
+{
+  "open_app": [
+    "^(?:open|start|launch|run)\\s+(?P<app_name>[a-zA-Z0-9_\\s\\.\\-]+)$",
+    "^(?:close|exit|kill|terminate)\\s+(?P<app_name>[a-zA-Z0-9_\\s\\.\\-]+)$"
+  ],
+  "search_web": [
+    "^(?:search\\s+for|search|google|lookup|look\\s+up)\\s+(?P<query>.+)$",
+    "^find\\s+information\\s+(?:on|about)\\s+(?P<query>.+)$",
+    "^what\\s+is\\s+(?P<query>(?:the\\s+)?(?:origin|history|definition|recipe|distance|population)\\s+(?:of|for)\\s+.+)$"
+  ],
+  "play_music": [
+    "^(?:play|listen\\s+to)\\s+(?P<song_name>.+?)\\s+(?:by|from)\\s+(?P<artist_name>[a-zA-Z0-9_\\s\\.\\-]+)$",
+    "^(?:play|listen\\s+to)\\s+(?P<song_name>.+)$",
+    "^(?P<music_control>pause|resume|stop|skip|next|previous)\\s+(?:music|song|playback)$"
+  ],
+  "system_cmd": [
+    "^(?P<system_action>mute|unmute)\\s+(?:the\\s+)?(?:volume|audio|sound|system)?$",
+    "^(?:volume|sound|audio)\\s+(?P<system_action>up|down)$",
+    "^(?:turn|set)\\s+(?:the\\s+)?(?:audio\\s+|system\\s+)?(?:volume|sound|audio)\\s+(?:to\\s+)?(?P<volume_value>\\d+)(?:%|\\s+percent)?$",
+    "^(?P<system_action>lock|shutdown|restart|reboot|sleep)\\s+(?:my\\s+|the\\s+)?(?:pc|computer|system)?$"
+  ],
+  "weather": [
+    "^(?:weather|temperature|forecast)\\s+(?:in|for|at)?\\s*(?P<location>[a-zA-Z\\s]+)$",
+    "^what\\s+is\\s+the\\s+weather\\s+(?:forecast\\s+)?(?:in|for|at)?\\s*(?P<location>[a-zA-Z\\s]+)$",
+    "^what\\s+is\\s+the\\s+temperature\\s+(?:in|for|at)?\\s*(?P<location>[a-zA-Z\\s]+)$",
+    "^will\\s+it\\s+rain\\s+(?P<time>today|tomorrow)\\s+in\\s+(?P<location>[a-zA-Z\\s]+)$",
+    "^will\\s+it\\s+rain\\s+in\\s+(?P<location>[a-zA-Z\\s]+)\\s+(?P<time>today|tomorrow)$",
+    "^will\\s+it\\s+rain\\s+(?:in\\s+(?P<location>[a-zA-Z\\s]+))?\\s*(?P<time>today|tomorrow)$",
+    "^will\\s+it\\s+rain\\s+(?P<time>today|tomorrow)(?:\\s+in\\s+(?P<location>[a-zA-Z\\s]+))?$"
+  ],
+  "todo": [
+    "^(?:add|remind\\s+me\\s+to)\\s+(?P<todo_task>.+?)\\s+to\\s+(?:my\\s+)?(?:todo|to-do|task|tasks)(?:\\s+list)?$",
+    "^(?:show|list|view|read)\\s+(?:my\\s+)?(?:todo|to-do|task|tasks)(?:\\s+list)?$",
+    "^(?:delete|remove|complete|finish|done)\\s+(?:todo|task)\\s+(?P<todo_task>.+)$"
+  ]
+}
