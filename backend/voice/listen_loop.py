@@ -172,22 +172,37 @@ class ListenLoop:
             
             # Check for completed sentences to speak immediately
             while True:
-                # Find the earliest sentence ending
-                earliest_idx = -1
-                
-                for ending_char in sentence_endings:
-                    idx = sentence_buffer.find(ending_char)
-                    if idx != -1 and (earliest_idx == -1 or idx < earliest_idx):
-                        earliest_idx = idx
-                
-                if earliest_idx == -1:
+                end_idx = -1
+                ending_len = 0
+                for char in sentence_endings:
+                    # Look for punctuation followed by space
+                    idx = sentence_buffer.find(char + " ")
+                    if idx != -1:
+                        if end_idx == -1 or idx < end_idx:
+                            end_idx = idx
+                            ending_len = 2 # length of char + space
+                    # Also look for punctuation followed by newline
+                    idx = sentence_buffer.find(char + "\n")
+                    if idx != -1:
+                        if end_idx == -1 or idx < end_idx:
+                            end_idx = idx
+                            ending_len = 2
+                            
+                # Check for raw newline boundaries
+                if end_idx == -1:
+                    idx = sentence_buffer.find("\n")
+                    if idx != -1:
+                        end_idx = idx
+                        ending_len = 1
+                        
+                if end_idx == -1:
                     break
+                    
+                # Extract the complete sentence
+                sentence = sentence_buffer[:end_idx + 1].strip()
+                sentence_buffer = sentence_buffer[end_idx + ending_len:]
                 
-                # Extract everything up to and including the punctuation
-                sentence = sentence_buffer[:earliest_idx + 1].strip()
-                sentence_buffer = sentence_buffer[earliest_idx + 1:].lstrip()
-                
-                # Clean up characters that break TTS (unmatched quotes, markdown)
+                # Clean up punctuation that breaks TTS (like unmatched quotes, markdown)
                 clean_sentence = sentence.replace('"', '').replace('*', '').replace('_', '').replace('`', '').strip()
                 if clean_sentence:
                     enqueue_speech(clean_sentence)

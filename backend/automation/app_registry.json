@@ -1,0 +1,15 @@
+{
+    "chrome": "chrome.exe",
+    "notepad": "notepad.exe",
+    "calculator": "calc.exe",
+    "calc": "calc.exe",
+    "explorer": "explorer.exe",
+    "vs code": "code.exe",
+    "vscode": "code.exe",
+    "visual studio code": "code.exe",
+    "edge": "msedge.exe",
+    "cmd": "cmd.exe",
+    "command prompt": "cmd.exe",
+    "terminal": "wt.exe",
+    "settings": "ms-settings:"
+}

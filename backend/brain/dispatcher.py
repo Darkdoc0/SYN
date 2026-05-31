@@ -17,6 +17,7 @@ from backend.utils.logger import get_logger
 from backend.brain.intent_router import IntentResult
 from backend.brain.module_registry import get_handler
 from backend.brain.llm_engine import LLMEngine
+import backend.automation.app_launcher # Register the app launcher handler
 
 logger = get_logger("DISPATCHER")
 

@@ -232,15 +232,14 @@ class GoogleSTT:
             with sr.AudioFile(wav_path) as source:
                 audio = self._recognizer.record(source)
 
-            # Single call with Hindi — Google will still transcribe English spoken words
-            # correctly when using hi-IN, but will also catch Hindi. This avoids
-            # the slow double-call approach.
+            # Try English first so commands like "open Chrome" don't get transcribed
+            # into Devanagari ("ओपन क्रोम") which breaks the intent router regex.
             try:
-                text = self._recognizer.recognize_google(audio, language="hi-IN")
+                text = self._recognizer.recognize_google(audio, language="en-IN")
             except sr.UnknownValueError:
-                # Hindi recognizer couldn't parse — try English
+                # English recognizer couldn't parse — try Hindi
                 try:
-                    text = self._recognizer.recognize_google(audio, language="en-IN")
+                    text = self._recognizer.recognize_google(audio, language="hi-IN")
                 except sr.UnknownValueError:
                     logger.warning("Google could not understand audio in any language.")
                     return {"text": "", "language": "en", "confidence": 0.0, "segments": []}

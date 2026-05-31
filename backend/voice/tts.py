@@ -72,19 +72,11 @@ class TTSQueueManager:
         Set to None to go back to auto-detection."""
         self._language_hint = lang
         if lang:
-            logger.info(f"Voice locked to: {'Hindi (SwaraNeural)' if lang == 'hi' else 'English (SoniaNeural)'}")
+            logger.info(f"Voice locked to: English (SoniaNeural) - Hindi voice disabled by user")
 
     def _pick_voice(self, text: str) -> str:
-        """Pick the correct Edge-TTS voice based on language hint or auto-detection."""
-        if self._language_hint == "hi":
-            return getattr(config, "TTS_EDGE_VOICE_HI", "hi-IN-SwaraNeural")
-        elif self._language_hint == "en":
-            return getattr(config, "TTS_EDGE_VOICE_EN", "en-GB-SoniaNeural")
-        else:
-            # No hint — auto-detect from text content
-            if is_hindi(text):
-                return getattr(config, "TTS_EDGE_VOICE_HI", "hi-IN-SwaraNeural")
-            return getattr(config, "TTS_EDGE_VOICE_EN", "en-GB-SoniaNeural")
+        """Always return the default English voice (Sonia) as requested by user."""
+        return getattr(config, "TTS_EDGE_VOICE_EN", "en-GB-SoniaNeural")
 
     def _synthesis_worker(self):
         while True:

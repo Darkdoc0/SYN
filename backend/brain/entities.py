@@ -92,8 +92,16 @@ def post_process_entities(intent: str, entities: dict) -> dict:
     """
     processed = entities.copy()
     
-    # 1. Normalize system commands
-    if intent == "system_cmd":
+    # 1. Normalize app commands
+    if intent == "open_app":
+        action = processed.get("app_action")
+        if action in ["close", "exit", "kill", "terminate"]:
+            processed["action"] = "close"
+        else:
+            processed["action"] = "open"
+            
+    # 2. Normalize system commands
+    elif intent == "system_cmd":
         action = processed.get("system_action")
         val = processed.get("volume_value")
         

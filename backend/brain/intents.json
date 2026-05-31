@@ -1,7 +1,7 @@
 {
   "open_app": [
-    "^(?:open|start|launch|run)\\s+(?P<app_name>[a-zA-Z0-9_\\s\\.\\-]+)$",
-    "^(?:close|exit|kill|terminate)\\s+(?P<app_name>[a-zA-Z0-9_\\s\\.\\-]+)$"
+    "^(?P<app_action>open|start|launch|run)\\s+(?P<app_name>[a-zA-Z0-9_\\s\\.\\-]+)$",
+    "^(?P<app_action>close|exit|kill|terminate)\\s+(?P<app_name>[a-zA-Z0-9_\\s\\.\\-]+)$"
   ],
   "search_web": [
     "^(?:search\\s+for|search|google|lookup|look\\s+up)\\s+(?P<query>.+)$",

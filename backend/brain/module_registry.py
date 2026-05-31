@@ -44,17 +44,6 @@ def get_handler(intent: str) -> Callable[[Dict[str, Any]], str]:
 #  MOCK CAPABILITY HANDLERS (Placeholder for Phase 4+)
 # ─────────────────────────────────────────────────────────────
 
-@register_module("open_app")
-def handle_open_app(entities: Dict[str, Any]) -> str:
-    """Mock handler for Day 8: App Launcher."""
-    app_name = entities.get("app_name", "unknown application")
-    action = entities.get("action", "open")
-    
-    logger.info(f"Mocking open_app: {action} {app_name}")
-    if action in ["close", "exit", "kill"]:
-        return f"Mock Action: Closing {app_name}."
-    return f"Mock Action: Launching {app_name}."
-
 
 @register_module("search_web")
 def handle_search_web(entities: Dict[str, Any]) -> str:
