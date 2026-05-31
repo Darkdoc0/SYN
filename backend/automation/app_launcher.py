@@ -65,19 +65,22 @@ def find_best_app_match(query: str) -> Tuple[Optional[str], Optional[str]]:
     """
     query = query.lower().strip()
     
-    # 1. Check custom registry first (exact or close match)
-    registry = load_app_registry()
-    matches = difflib.get_close_matches(query, registry.keys(), n=1, cutoff=0.7)
-    if matches:
-        return matches[0], registry[matches[0]]
+    # Combine custom registry and auto-discovered apps
+    apps_db = {}
+    apps_db.update(discover_start_menu_apps())
+    apps_db.update(load_app_registry()) # Registry overrides start menu if there's a conflict
+    
+    # 1. Exact match first
+    if query in apps_db:
+        return query, apps_db[query]
         
-    # 2. Check auto-discovered start menu apps
-    start_menu_apps = discover_start_menu_apps()
-    matches = difflib.get_close_matches(query, start_menu_apps.keys(), n=1, cutoff=0.6)
+    # 2. Fuzzy match against all available apps
+    # We use a slightly higher cutoff (0.75) to prevent completely unrelated apps from matching
+    matches = difflib.get_close_matches(query, apps_db.keys(), n=1, cutoff=0.75)
     if matches:
-        return matches[0], start_menu_apps[matches[0]]
+        return matches[0], apps_db[matches[0]]
         
-    # 3. Fallback to just returning the query as an executable (e.g. 'notepad' -> 'notepad.exe' via PATH)
+    # 3. Fallback to just returning the query as an executable (e.g. 'calc' -> 'calc' via PATH)
     return query, query
 
 def close_application(query: str) -> str:
