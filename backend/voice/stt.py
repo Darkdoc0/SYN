@@ -88,21 +88,21 @@ class WhisperSTT:
             return  # already loaded
 
         try:
+            import os
+            os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
             from faster_whisper import WhisperModel
 
-            logger.info(f"Loading Whisper model '{self.model_size}'...")
-            logger.info("(First time will download ~150 MB. After that, it's cached.)")
+            # We read device/compute config from config.py to allow GPU acceleration
+            device = getattr(config, "STT_WHISPER_DEVICE", "cpu")
+            compute_type = getattr(config, "STT_WHISPER_COMPUTE", "int8")
+            
+            logger.info(f"Loading Whisper model '{self.model_size}' on {device.upper()} ({compute_type})...")
+            logger.info("(First time will download model. After that, it's cached.)")
 
-            # compute_type explanation:
-            #   "int8"  = 8-bit integers — fastest on CPU, slightly less accurate
-            #   "float16" = half precision — needs GPU (CUDA)
-            #   "float32" = full precision — slowest but most accurate on CPU
-            # We use int8 for speed on CPU. If you have an NVIDIA GPU,
-            # change device to "cuda" and compute_type to "float16".
             self._model = WhisperModel(
                 self.model_size,
-                device="cpu",           # "cpu" or "cuda" (GPU)
-                compute_type="int8",    # quantization for CPU speed
+                device=device,
+                compute_type=compute_type,
             )
 
             logger.info("Whisper model loaded successfully!")

@@ -26,13 +26,12 @@ def start_syn():
     show_state("BOOTING")
 
     # Boot greeting
-    speak(config.SYN_BOOT_MESSAGE)
-    speak("Voice systems online. Clap detection active.")
+    # We no longer speak here, because listen_loop will speak SYN_BOOT_MESSAGE on start
     logger.info("Boot sequence complete.")
 
     # Instructions
-    print(f"  [*] {config.CLAP_PATTERN.capitalize()}-clap to wake SYN")
-    print("  [*] Speak your command after the greeting")
+    print(f"  [*] JARVIS Mode Active: S.Y.N. is always listening.")
+    print(f"  [*] Say a wake word ({', '.join(config.WAKE_WORDS)}) or give a direct command.")
     print("  [*] Press Ctrl+C to shut down")
     print()
 
@@ -51,7 +50,7 @@ def start_syn():
 
 
 def test_stt():
-    """Quick test: record + transcribe without clap detection."""
+    """Quick test: record + transcribe without context filtering."""
     print()
     print("=" * 55)
     print("  S.Y.N. -- Speech-to-Text Test")
@@ -81,12 +80,6 @@ def test_stt():
         print("  No speech detected.")
 
 
-def calibrate():
-    """Run mic calibration for your room."""
-    from backend.voice.clap_detector import calibrate_clap_threshold
-    calibrate_clap_threshold()
-
-
 def list_devices():
     """List all available audio input devices."""
     from backend.voice.mic_stream import MicStream
@@ -108,8 +101,6 @@ def list_devices():
 if __name__ == "__main__":
     if "--test-stt" in sys.argv:
         test_stt()
-    elif "--calibrate" in sys.argv:
-        calibrate()
     elif "--devices" in sys.argv:
         list_devices()
     else:

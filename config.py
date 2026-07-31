@@ -13,18 +13,14 @@ MIC_SAMPLE_RATE = 44100          # Hz — standard audio sample rate
 MIC_CHUNK_SIZE = 1024            # Frames per buffer read (lower = more responsive, higher CPU)
 MIC_FORMAT_WIDTH = 2             # Bytes per sample (2 = 16-bit audio)
 MIC_CHANNELS = 1                 # 1 = mono (clap detection only needs mono)
+SPEECH_ENERGY_THRESHOLD = 400    # Audio energy required to trigger recording
 
 # ──────────────────────────────────────────────
-#  CLAP DETECTION
+#  CONTEXT ENGINE (ALWAYS LISTENING)
 # ──────────────────────────────────────────────
-CLAP_ENERGY_THRESHOLD = 1000     # Calibrated for your room (peak noise ~201)
-CLAP_MIN_FREQUENCY = 1500        # Hz — claps are typically broadband, above 1.5 kHz
-CLAP_MAX_FREQUENCY = 8000        # Hz — upper bound for clap frequency detection
-CLAP_MIN_DURATION_MS = 5         # Min spike duration in ms (claps are very short)
-CLAP_MAX_DURATION_MS = 120       # Max spike duration in ms
-CLAP_DOUBLE_TAP_WINDOW = 1.2    # Seconds — max time between two claps for a "double clap"
-CLAP_COOLDOWN = 2.0              # Seconds — ignore claps after a successful double-clap
-CLAP_PATTERN = "double"          # "single" or "double" — trigger mode
+WAKE_WORDS = ["syn", "sin"]
+CONVERSATION_WINDOW = 15.0       # Seconds — S.Y.N. stays 'awake' after speaking
+COMMAND_BYPASS_THRESHOLD = 0.85  # Confidence required to bypass wake word for commands
 
 # ──────────────────────────────────────────────
 #  TTS (Text-to-Speech)
@@ -39,8 +35,10 @@ TTS_VOICE_INDEX = 0              # 0 = default voice, 1 = alt voice (varies by O
 # ──────────────────────────────────────────────
 #  STT (Speech-to-Text) — Day 3
 # ──────────────────────────────────────────────
-STT_ENGINE = "google"            # "whisper" (offline) or "google" (cloud fallback)
-STT_WHISPER_MODEL = "base"       # tiny, base, small, medium, large
+STT_ENGINE = "whisper"           # "whisper" (offline) or "google" (cloud fallback)
+STT_WHISPER_MODEL = "small"      # tiny, base, small, medium, large
+STT_WHISPER_DEVICE = "cpu"       # "cuda" for GPU, "cpu" otherwise (fallback to CPU to avoid CUDA hangs)
+STT_WHISPER_COMPUTE = "int8"     # "float16" for GPU, "int8" for CPU
 STT_SILENCE_TIMEOUT = 2.0        # Seconds of silence before stopping recording
 STT_MAX_RECORD_TIME = 20.0       # Max recording time in seconds
 

@@ -52,14 +52,11 @@ class AudioRecorder:
     """
 
     def __init__(self):
-        # ── Thresholds ──
         # Speech threshold: audio louder than this = "someone is talking"
-        # We use a lower threshold than clap detection because speech
-        # is quieter than a clap but still clearly above silence.
-        self.speech_threshold = config.CLAP_ENERGY_THRESHOLD * 0.4
+        self.speech_threshold = getattr(config, "SPEECH_ENERGY_THRESHOLD", 400)
 
-        # How long to wait for the user to START speaking (seconds)
-        self.max_wait_for_speech = 8.0
+        # How long to wait for the user to START speaking (seconds). None = infinite wait.
+        self.max_wait_for_speech = None
 
         # How long silence must last to STOP recording (seconds)
         self.silence_timeout = config.STT_SILENCE_TIMEOUT  # 2.0s
@@ -69,6 +66,12 @@ class AudioRecorder:
 
         # The mic stream (shared with clap detector)
         self._mic = MicStream()
+        
+        # Track if assistant is speaking to inflate threshold and prevent echo
+        self._assistant_speaking = False
+
+    def set_assistant_speaking(self, is_speaking: bool):
+        self._assistant_speaking = is_speaking
 
     def record(self, existing_mic: MicStream = None) -> str | None:
         """
@@ -97,16 +100,17 @@ class AudioRecorder:
         if not mic.is_running:
             mic.start()
 
-        logger.info(f"Listening for speech... (threshold: {self.speech_threshold:.0f})")
+        frames = []
+        speech_detected = False
+        silence_start: float | None = None
+        record_start = time.time()
+        wait_start = time.time()
+        
+        # Track if this recording picked up while she was speaking
+        overlapped = False
 
-        # ── State tracking ──
-        frames: list[bytes] = []       # collected audio chunks (raw bytes)
-        speech_detected = False        # has the user started talking?
-        silence_start: float = None    # when did the current silence begin?
-        record_start: float = None     # when did we start saving audio?
-        wait_start = time.time()       # when did we start waiting?
+        logger.info(f"Listening for speech... (threshold: {self.speech_threshold})")
 
-        # ── Main recording loop ──
         while True:
             # Read one chunk from the mic
             # WHY read_raw()? Because we need the raw bytes to save to WAV.
@@ -116,7 +120,13 @@ class AudioRecorder:
 
             # Calculate energy (loudness) of this chunk
             energy = self._calculate_rms(audio_chunk)
-            is_speech = energy > self.speech_threshold
+            
+            # Dynamic threshold to prevent echo cancellation loop (inflate if S.Y.N. is talking)
+            current_threshold = self.speech_threshold * 6.0 if self._assistant_speaking else self.speech_threshold
+            is_speech = energy > current_threshold
+            
+            if is_speech and self._assistant_speaking:
+                overlapped = True
 
             # ── STATE 1: Waiting for speech to begin ──
             if not speech_detected:
@@ -128,12 +138,12 @@ class AudioRecorder:
 
                     logger.info(f"Speech detected! (energy: {energy:.0f}) Recording...")
 
-                elif (time.time() - wait_start) > self.max_wait_for_speech:
+                elif self.max_wait_for_speech is not None and (time.time() - wait_start) > self.max_wait_for_speech:
                     # User didn't say anything — timeout
                     logger.info("No speech detected. Timeout.")
                     if owns_mic:
                         mic.stop()
-                    return None
+                    return None, False
 
                 continue  # keep waiting for speech
 
@@ -167,14 +177,14 @@ class AudioRecorder:
             mic.stop()
 
         if not frames:
-            return None
+            return None, False
 
         wav_path = self._save_wav(frames, mic.sample_rate, mic.channels)
 
         duration = len(frames) * mic.chunk_size / mic.sample_rate
         logger.info(f"Saved {duration:.1f}s of audio to: {wav_path}")
 
-        return wav_path
+        return wav_path, overlapped
 
     def _save_wav(self, frames: list[bytes], sample_rate: int, channels: int) -> str:
         """
