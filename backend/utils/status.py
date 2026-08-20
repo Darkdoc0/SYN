@@ -25,7 +25,7 @@ logger = get_logger("STATUS")
 # Using ASCII-safe characters for Windows compatibility
 STATES = {
     "BOOTING":    "[>>>] BOOTING",
-    "READY":      "[ * ] READY — waiting for clap",
+    "READY":      "[ * ] READY — waiting for wake word ('Hey SYN')",
     "LISTENING":  "[ @ ] LISTENING — speak now...",
     "PROCESSING": "[...] PROCESSING — transcribing...",
     "THINKING":   "[...] THINKING — generating response...",

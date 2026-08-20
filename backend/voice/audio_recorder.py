@@ -73,7 +73,7 @@ class AudioRecorder:
     def set_assistant_speaking(self, is_speaking: bool):
         self._assistant_speaking = is_speaking
 
-    def record(self, existing_mic: MicStream = None) -> str | None:
+    def record(self, existing_mic: MicStream = None, max_wait: float | None = None) -> tuple[str | None, bool]:
         """
         Record audio until the user stops speaking.
 
