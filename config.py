@@ -18,7 +18,7 @@ SPEECH_ENERGY_THRESHOLD = 400    # Audio energy required to trigger recording
 # ──────────────────────────────────────────────
 #  WAKE WORD ENGINE (openWakeWord)
 # ──────────────────────────────────────────────
-WAKE_WORD_MODEL = "hey_jarvis"   # "hey_jarvis", "alexa", "hey_mycroft"
+WAKE_WORD_MODEL = "hey_syn"      # "hey_syn" (pronounced 'sin'), "hey_jarvis", "alexa"
 WAKE_WORD_THRESHOLD = 0.5        # Detection confidence (0.0 to 1.0)
 CONVERSATION_WINDOW = 15.0       # Seconds — S.Y.N. stays 'awake' for follow-up questions
 

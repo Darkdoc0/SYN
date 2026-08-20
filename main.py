@@ -31,7 +31,7 @@ def start_syn():
 
     # Instructions
     print(f"  [*] openWakeWord Engine Active: S.Y.N. is in low-power sleep mode.")
-    print(f"  [*] Say '{config.WAKE_WORD_MODEL.replace('_', ' ').title()}' to wake her up!")
+    print(f"  [*] Say 'SYN' (pronounced 'sin') or 'Hey SYN' to wake her up!")
     print(f"  [*] Conversation window: {config.CONVERSATION_WINDOW}s for direct follow-ups.")
     print("  [*] Press Ctrl+C to shut down")
     print()
