@@ -102,6 +102,9 @@ def list_devices():
 if __name__ == "__main__":
     if "--test-stt" in sys.argv:
         test_stt()
+    elif "--calibrate-voice" in sys.argv:
+        from backend.voice.calibrate_voice import calibrate_and_train
+        calibrate_and_train()
     elif "--devices" in sys.argv:
         list_devices()
     else:
