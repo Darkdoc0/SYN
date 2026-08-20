@@ -9,18 +9,18 @@ hardware (mic sensitivity, clap thresholds, etc.)
 #  MICROPHONE
 # ──────────────────────────────────────────────
 MIC_DEVICE_INDEX = None          # None = system default mic. Set to int for specific device.
-MIC_SAMPLE_RATE = 44100          # Hz — standard audio sample rate
-MIC_CHUNK_SIZE = 1024            # Frames per buffer read (lower = more responsive, higher CPU)
+MIC_SAMPLE_RATE = 16000          # Hz — standard 16kHz for Whisper & openWakeWord
+MIC_CHUNK_SIZE = 1280            # 80ms chunk size for openWakeWord
 MIC_FORMAT_WIDTH = 2             # Bytes per sample (2 = 16-bit audio)
-MIC_CHANNELS = 1                 # 1 = mono (clap detection only needs mono)
+MIC_CHANNELS = 1                 # 1 = mono
 SPEECH_ENERGY_THRESHOLD = 400    # Audio energy required to trigger recording
 
 # ──────────────────────────────────────────────
-#  CONTEXT ENGINE (ALWAYS LISTENING)
+#  WAKE WORD ENGINE (openWakeWord)
 # ──────────────────────────────────────────────
-WAKE_WORDS = ["syn", "sin"]
-CONVERSATION_WINDOW = 15.0       # Seconds — S.Y.N. stays 'awake' after speaking
-COMMAND_BYPASS_THRESHOLD = 0.85  # Confidence required to bypass wake word for commands
+WAKE_WORD_MODEL = "hey_jarvis"   # "hey_jarvis", "alexa", "hey_mycroft"
+WAKE_WORD_THRESHOLD = 0.5        # Detection confidence (0.0 to 1.0)
+CONVERSATION_WINDOW = 15.0       # Seconds — S.Y.N. stays 'awake' for follow-up questions
 
 # ──────────────────────────────────────────────
 #  TTS (Text-to-Speech)

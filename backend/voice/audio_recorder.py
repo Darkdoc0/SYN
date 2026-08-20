@@ -83,15 +83,7 @@ class AudioRecorder:
                          already has the mic open.
 
         Returns:
-            Path to the recorded WAV file, or None if no speech detected.
-
-        WHAT HAPPENS STEP BY STEP:
-            1. Open mic (or reuse existing one)
-            2. Wait for the user to start speaking (skip initial silence)
-            3. Record while they're speaking
-            4. When silence lasts > 2 seconds, stop
-            5. Save to a temporary .wav file
-            6. Return the file path
+            (wav_path, overlapped): Path to WAV file and boolean if it overlapped assistant speech.
         """
         # Use existing mic or create new one
         mic = existing_mic or self._mic
@@ -105,6 +97,7 @@ class AudioRecorder:
         silence_start: float | None = None
         record_start = time.time()
         wait_start = time.time()
+        wait_timeout = max_wait if max_wait is not None else self.max_wait_for_speech
         
         # Track if this recording picked up while she was speaking
         overlapped = False
@@ -138,7 +131,7 @@ class AudioRecorder:
 
                     logger.info(f"Speech detected! (energy: {energy:.0f}) Recording...")
 
-                elif self.max_wait_for_speech is not None and (time.time() - wait_start) > self.max_wait_for_speech:
+                elif wait_timeout is not None and (time.time() - wait_start) > wait_timeout:
                     # User didn't say anything — timeout
                     logger.info("No speech detected. Timeout.")
                     if owns_mic:
