@@ -105,7 +105,9 @@ class ListenLoop:
                     )
 
                     if not wav_path:
-                        speak("I'm listening.")
+                        # User woke S.Y.N. up but didn't say a command within 6s
+                        logger.info("No command spoken after wake word. Returning to sleep.")
+                        self._set_state("READY")
                         continue
 
                 # Process the recorded command audio
@@ -126,8 +128,8 @@ class ListenLoop:
                     confidence=result.get("confidence", 0),
                 )
 
-                # Execute command
-                self._start_response_thread(text, result)
+                # Execute command and speak response completely before returning to listen
+                self._handle_command(text, result)
 
             except KeyboardInterrupt:
                 logger.info("Keyboard interrupt received.")
@@ -143,24 +145,6 @@ class ListenLoop:
         self._interrupted_loop = True
         self._mic.stop()
         logger.info("Listen loop stopped.")
-
-    def _start_response_thread(self, text: str, stt_result: dict):
-        with self._lock:
-            if self._current_state == "RESPONDING":
-                logger.info("Interruption detected! Halting previous response.")
-                self._interrupted_response = True
-                stop_speech()
-
-        time.sleep(0.1)
-
-        with self._lock:
-            self._interrupted_response = False
-
-        threading.Thread(
-            target=self._handle_command,
-            args=(text, stt_result),
-            daemon=True,
-        ).start()
 
     def _handle_command(self, text: str, stt_result: dict):
         """
@@ -246,6 +230,4 @@ class ListenLoop:
         logger.info(f"Pipeline executed successfully. Spoke: \"{final_text}\"")
 
         self._recorder.set_assistant_speaking(False)
-        with self._lock:
-            if not self._interrupted_response:
-                self._set_state("READY")
+        self._set_state("READY")
