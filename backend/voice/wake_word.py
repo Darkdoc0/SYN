@@ -55,7 +55,7 @@ class WakeWordDetector:
                 logger.error(f"Failed to load wake word model: {e}", exc_info=True)
                 raise e
 
-    def listen_for_wake_word(self, existing_mic: MicStream = None, timeout: float | None = None) -> bool:
+    def listen_for_wake_word(self, existing_mic: MicStream = None, timeout: float | None = None, threshold_override: float | None = None) -> bool:
         """
         Blocks until the wake word is spoken or timeout is reached.
         """
@@ -66,13 +66,14 @@ class WakeWordDetector:
             mic.start()
 
         start_time = time.time()
+        active_threshold = threshold_override if threshold_override is not None else self.threshold
 
         if self._is_custom:
             self._af.reset()
         else:
             self._oww_model.reset()
 
-        logger.debug(f"Listening for wake word '{self.model_name}'...")
+        logger.debug(f"Listening for wake word '{self.model_name}' (thresh: {active_threshold})...")
 
         try:
             while mic.is_running:
@@ -90,14 +91,14 @@ class WakeWordDetector:
                         flat_feat = feat[0].reshape(1, -1)
                         probs = self._custom_model.predict_proba(flat_feat)
                         score = float(probs[0][1])
-                        if score >= self.threshold:
+                        if score >= active_threshold:
                             logger.info(f"Wake word 'SYN' (Sin) DETECTED! (confidence: {score:.3f})")
                             self._af.reset()
                             return True
                 else:
                     prediction = self._oww_model.predict(audio_chunk)
                     score = prediction.get(self.model_name, 0.0)
-                    if score >= self.threshold:
+                    if score >= active_threshold:
                         logger.info(f"Wake word '{self.model_name}' DETECTED! (confidence: {score:.3f})")
                         self._oww_model.reset()
                         return True
